@@ -1,71 +1,67 @@
-## 🚀 Guía de Inicio Rápido (Entorno Isard / Docker)
+# 🚀 Proyecto Laravel + Frontend (Entorno Híbrido Docker/Local)
 
-Esta guía explica cómo levantar el proyecto desde cero en un escritorio virtual de Isard (o cualquier entorno basado en Linux/Docker).
-
-### Prerrequisitos
-
-Asegúrate de tener instalados y corriendo en tu máquina:
-* **Docker**
-* **Docker Compose**
-* **Git**
+Este repositorio utiliza **Laravel Sail (Docker)** para el backend/API y la base de datos, garantizando un entorno idéntico entre desarrolladores, y **Vite en la máquina local** para asegurar un rendimiento óptimo y rápido durante el desarrollo del frontend.
 
 ---
 
-### Pasos de Instalación
+## 📋 Prerrequisitos
 
-#### 1. Clonar el repositorio
+Antes de comenzar la instalación, asegúrate de tener instalado en tu equipo:
+
+* **Git**: [Descargar Git](https://git-scm.com/)
+* **Node.js** (v18 o superior) y **npm** (para ejecutar Vite en local).
+* **Docker Engine / Desktop**:
+  * **Windows**: [Docker Desktop](https://www.docker.com/products/docker-desktop/) iniciado y configurado.
+  * **Ubuntu / Linux**: Docker Engine + Docker Compose habilitados en tu escritorio virtual.
+
+---
+
+## 🐧 Guía de Instalación en Ubuntu / Linux (Isard)
+
+### 1. Clonar el repositorio
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <nombre-de-la-carpeta>
 ```
 
-#### 2. Configurar variables de entorno
-Copia la plantilla de entorno `.env.example` para crear tu fichero `.env` local:
+## Configurar variables de entorno
 ```bash
+
 cp .env.example .env
 ```
-
-#### 3. Levantar los contenedores
-Ejecuta el siguiente comando para construir y arrancar los servicios en segundo plano:
-
-```bash
-docker compose up -d --build
-```
-
-> **Nota:** Al arrancar por primera vez, el script `entrypoint.sh` se ejecutará automáticamente y realizará las siguientes tareas de forma desatendida:
-> - Instalará las dependencias de Composer (`vendor/`).
-> - Generará la `APP_KEY` de Laravel en tu `.env`.
-
-#### 4. Migraciones y Seeders (Base de datos)
-Una vez que los contenedores estén levantados, ejecuta las migraciones para preparar la base de datos:
+## Instalar dependencias de Composer (Primer Arranque)
+Como la carpeta vendor/ no se sube al repositorio, utilizamos un contenedor temporal para instalar Composer:
 
 ```bash
-docker compose exec app php artisan migrate --seed
-```
-*Verificación:* Si las migraciones finalizan sin errores, la base de datos está lista.
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
 
-#### 5. Frontend (Vite)
-Instala las dependencias del frontend e inicia el servidor de desarrollo:
+    ```
+
+## Levantar los contenedores Sail
 
 ```bash
-# Instalar paquetes de Node
-docker compose exec app npm install
+./vendor/bin/sail up -d
+```
+## Configurar clave y base de datos
 
-# Arrancar el servidor de desarrollo
-docker compose exec app npm run dev
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
+```
+## Instalar e iniciar el Frontend (Local)
+
+Abre una terminal normal en tu máquina (fuera de Docker):
+
+```bash
+npm install
+npm run dev
 ```
 
----
 
-### Acceso a la Aplicación
 
-* **Backend / App:** `http://localhost` (o `http://localhost:8000` según tu `docker-compose.yml`)
-* **Vite Dev Server:** `http://localhost:5173`
 
----
-
-### Comandos Útiles del Día a Día
-
-* **Detener los contenedores:** `docker compose down`
-* **Ver logs de la aplicación:** `docker compose logs -f app`
-* **Ejecutar comandos artisan:** `docker compose exec app php artisan <comando>`
