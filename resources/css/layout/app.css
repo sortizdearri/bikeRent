@@ -1,0 +1,19 @@
+.app {
+    min-height: 100vh;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+}
+
+.app__header {
+    background-color: var(--md-sys-color-surface-container);
+}
+
+.app__contenedor {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: 1.5rem;
+}
+
+.app__main {
+    width: 100%;
+}
